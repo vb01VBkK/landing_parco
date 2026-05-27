@@ -1,0 +1,6 @@
+{
+  "name": "Parco degli Oleandri Nola",
+  "description": "Landing page di presentazione per gli appartamenti eco-sostenibili in classe energetica A del complesso residenziale Parco degli Oleandri a Nola.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

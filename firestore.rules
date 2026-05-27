@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedAdmin() {
+      return isSignedIn() && 
+             request.auth.token.email == 'cittaincantatafestival@gmail.com' && 
+             request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Lead Entity Match Block
+    match /leads/{leadId} {
+      
+      // Allow list queries and single get operations only for the verified administrator
+      allow get: if isValidId(leadId) && isVerifiedAdmin();
+      allow list: if isVerifiedAdmin();
+      
+      // Allow public creation of leads under strict schema checks
+      allow create: if isValidId(leadId) && 
+                    incoming().keys().hasAll(['name', 'phone', 'email', 'propertyType', 'message', 'bookVisit', 'requestBrochure', 'createdAt', 'status']) && 
+                    incoming().keys().size() == 9 &&
+                    incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100 &&
+                    incoming().phone is string && incoming().phone.size() > 0 && incoming().phone.size() <= 30 &&
+                    incoming().email is string && incoming().email.size() > 0 && incoming().email.size() <= 100 &&
+                    incoming().propertyType is string && incoming().propertyType in ['bilocale', 'trilocale', 'quadrilocale', 'attico', 'non_specificato'] &&
+                    incoming().message is string && incoming().message.size() <= 1000 &&
+                    incoming().bookVisit is bool &&
+                    incoming().requestBrochure is bool &&
+                    incoming().status == 'new' &&
+                    incoming().createdAt == request.time;
+
+      // Allow updating lead fields (e.g. changing status) exclusively for verified admin
+      allow update: if isValidId(leadId) && isVerifiedAdmin() &&
+                    incoming().createdAt == existing().createdAt && // Ensure immutability of creation time
+                    incoming().email == existing().email &&         // Ensure immutability of identity fields
+                    incoming().name == existing().name &&
+                    incoming().phone == existing().phone &&
+                    incoming().propertyType == existing().propertyType &&
+                    incoming().message == existing().message &&
+                    incoming().bookVisit == existing().bookVisit &&
+                    incoming().requestBrochure == existing().requestBrochure &&
+                    incoming().status is string && 
+                    incoming().status in ['new', 'contacted', 'archived'] &&
+                    incoming().keys().hasAll(['name', 'phone', 'email', 'propertyType', 'message', 'bookVisit', 'requestBrochure', 'createdAt', 'status']) && 
+                    incoming().keys().size() == 9;
+
+      // Allow deletion only for verified admin
+      allow delete: if isValidId(leadId) && isVerifiedAdmin();
+    }
+  }
+}

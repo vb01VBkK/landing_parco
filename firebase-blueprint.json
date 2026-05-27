@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Una richiesta di contatto per gli appartamenti del Parco degli Oleandri",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nome e cognome del potenziale acquirente"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Numero di telefono per ricontatto"
+        },
+        "email": {
+          "type": "string",
+          "description": "Indirizzo email del contatto",
+          "format": "email"
+        },
+        "propertyType": {
+          "type": "string",
+          "description": "Modello di appartamento preferito",
+          "enum": ["bilocale", "trilocale", "quadrilocale", "attico", "non_specificato"]
+        },
+        "message": {
+          "type": "string",
+          "description": "Messaggio aggiuntivo facoltativo"
+        },
+        "bookVisit": {
+          "type": "boolean",
+          "description": "Indica se l'utente richiede una visita guidata"
+        },
+        "requestBrochure": {
+          "type": "boolean",
+          "description": "Indica se l'utente richiede l'invio della brochure PDF"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data e ora di ricezione del lead"
+        },
+        "status": {
+          "type": "string",
+          "description": "Stato di gestione del lead",
+          "enum": ["new", "contacted", "archived"]
+        }
+      },
+      "required": ["name", "phone", "email", "propertyType", "bookVisit", "requestBrochure", "createdAt", "status"]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Collezione pubblica per l'inserimento dei lead di contatto"
+    }
+  }
+}
