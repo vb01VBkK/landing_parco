@@ -13,6 +13,7 @@ import { WhatsAppChat } from './components/WhatsAppChat';
 import { PrivacyModal } from './components/PrivacyModal';
 import { DynamicIcon } from './components/DynamicIcon';
 import { BrokerConsole } from './components/BrokerConsole';
+import { InteractiveBuilding } from './components/InteractiveBuilding';
 import { InquiryForm } from './types';
 
 export default function App() {
@@ -50,6 +51,13 @@ export default function App() {
 
   const handlePrefillSelect = (unitId: string) => {
     setFormPrefill(unitId);
+  };
+
+  const handleOpenBuildingExplorer = () => {
+    document.getElementById('edificio-virtuale')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
   const handleClearLeads = () => {
@@ -116,10 +124,10 @@ export default function App() {
               {/* Action row */}
               <div className="flex flex-wrap gap-4 items-center pt-2">
                 <button
-                  onClick={() => setIsPropertyModalOpen(true)}
+                  onClick={handleOpenBuildingExplorer}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 text-sm shadow-lg shadow-blue-600/20 flex items-center space-x-2.5 active:scale-98 cursor-pointer"
                 >
-                  <span>Scopri la tua nuova casa</span>
+                  <span>Esplora edificio virtuale</span>
                   <DynamicIcon name="ArrowRight" size={16} />
                 </button>
 
@@ -155,32 +163,35 @@ export default function App() {
         </div>
       </main>
 
-      {/* 3. Bottom position attributes bar */}
+      {/* 3. Interactive virtual building selector */}
+      <InteractiveBuilding onSelectUnit={handlePrefillSelect} />
+
+      {/* 4. Bottom position attributes bar */}
       <footer id="bottom-bar-wrapper" className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-12 pt-6">
         <PositionGrid />
       </footer>
 
-      {/* 4. Real Estate Property details selector Modal */}
+      {/* 5. Real Estate Property details selector Modal */}
       <PropertyViewerModal 
         isOpen={isPropertyModalOpen} 
         onClose={() => setIsPropertyModalOpen(false)}
         onSelectUnit={handlePrefillSelect}
       />
 
-      {/* 5. Simulated real-time WhatsApp Drawer Chat */}
+      {/* 6. Simulated real-time WhatsApp Drawer Chat */}
       <WhatsAppChat 
         isOpen={isWhatsAppOpen} 
         onClose={() => setIsWhatsAppOpen(false)}
         onFormPrefill={handlePrefillSelect}
       />
 
-      {/* 6. Privacy Compliance GDPR modal */}
+      {/* 7. Privacy Compliance GDPR modal */}
       <PrivacyModal 
         isOpen={isPrivacyModalOpen} 
         onClose={() => setIsPrivacyModalOpen(false)}
       />
 
-      {/* 7. Leads monitor CRM dashboard (Admin sandbox helper for checking submission results) */}
+      {/* 8. Leads monitor CRM dashboard (Admin sandbox helper for checking submission results) */}
       <div className="fixed bottom-4 left-4 z-40">
         <button
           onClick={() => setIsAdminDrawerOpen(!isAdminDrawerOpen)}
