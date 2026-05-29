@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InquiryForm } from '../types';
 import { DynamicIcon } from './DynamicIcon';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
@@ -45,6 +45,12 @@ export const InquiryFormCard: React.FC<InquiryFormCardProps> = ({
   const [errors, setErrors] = useState<Partial<Record<keyof InquiryForm, string>>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!prefilledPropertyType) return;
+
+    setForm(prev => ({ ...prev, propertyType: prefilledPropertyType }));
+  }, [prefilledPropertyType]);
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof InquiryForm, string>> = {};
